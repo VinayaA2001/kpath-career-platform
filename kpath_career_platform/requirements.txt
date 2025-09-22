@@ -2,5 +2,8 @@ streamlit
 PyPDF2
 pandas
 numpy
-openai
 scikit-learn
+nltk
+openai
+python-docx
+requests
