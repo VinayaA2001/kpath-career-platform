@@ -2,7 +2,7 @@ import streamlit as st
 import PyPDF2
 from models import resume_parser
 from utils import db
-import spacy
+
 
 # --- Page Title ---
 st.title("📂 Resume Analyzer")
@@ -32,9 +32,9 @@ if uploaded_file:
     candidate_name = st.text_input("👤 Enter your name", "Candidate")
 
     # --- Save to Database ---
-    conn = db.init_db()
+    db.init_db()   # initialize once (creates table if needed)
     if st.button("💾 Save to Database"):
-        db.save_resume(conn, candidate_name, resume_info)
+        db.save_resume(candidate_name, resume_info)  # ✅ no conn needed
         st.success("✅ Resume saved successfully!")
 
     # --- Display Resume Summary ---
@@ -98,3 +98,12 @@ if uploaded_file:
                 st.write(f"- {s}")
         else:
             st.success("🎉 No major skill gaps detected!")
+
+# --- View Saved Resumes Section ---
+st.subheader("📂 View Saved Resumes")
+if st.button("📋 Show All Resumes"):
+    resumes = db.fetch_all_resumes()
+    if resumes:
+        st.dataframe(resumes)  # nice table view
+    else:
+        st.info("No resumes found in the database.")

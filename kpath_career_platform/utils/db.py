@@ -25,6 +25,25 @@ def init_db():
     conn.close()
     print("✅ Database initialized")
 
+def save_resume(name: str, resume_info: dict):
+    """Save parsed resume information into the database"""
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO resumes (name, qualifications, skills, soft_skills, experience, certifications)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (
+        name,
+        ", ".join(resume_info.get("qualifications", [])),
+        ", ".join(resume_info.get("tech_skills", [])),
+        ", ".join(resume_info.get("soft_skills", [])),
+        resume_info.get("experience", 0),
+        ", ".join(resume_info.get("certifications", []))
+    ))
+    conn.commit()
+    conn.close()
+    print(f"💾 Resume saved for {name}")
+
 def delete_candidate(candidate_id: int):
     """Delete candidate from database by ID"""
     conn = get_connection()
@@ -32,3 +51,13 @@ def delete_candidate(candidate_id: int):
     c.execute("DELETE FROM resumes WHERE id=?", (candidate_id,))
     conn.commit()
     conn.close()
+    print(f"🗑 Candidate {candidate_id} deleted")
+
+def fetch_all_resumes():
+    """Fetch all resumes from database"""
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("SELECT * FROM resumes")
+    rows = c.fetchall()
+    conn.close()
+    return rows
