@@ -1,10 +1,11 @@
 import re
 import spacy
 
+
 # Load spaCy English model
 nlp = spacy.load("en_core_web_sm")
 
-# Define skill dictionaries
+# --- Dictionaries of skills ---
 TECH_SKILLS = [
     "python", "java", "c++", "sql", "javascript", "html", "css",
     "machine learning", "deep learning", "nlp", "react", "node.js",
@@ -16,14 +17,14 @@ SOFT_SKILLS = [
     "time management", "adaptability", "creativity", "critical thinking"
 ]
 
-# --- Years of experience extraction ---
+# --- Extract Years of Experience ---
 def extract_years_of_experience(text: str):
     match = re.search(r"(\d+)\+?\s+years?", text.lower())
     if match:
         return int(match.group(1))
     return 0
 
-# --- Main function ---
+# --- Extract Resume Info ---
 def extract_resume_info(resume_text: str):
     doc = nlp(resume_text)
 
@@ -52,9 +53,9 @@ def extract_resume_info(resume_text: str):
         "certifications": list(set(certifications)),
         "organizations": list(set(orgs)),
     }
-def suggest_careers(resume_info):
-    """Suggest possible careers based on extracted skills & qualifications."""
 
+# --- Career Suggestions ---
+def suggest_careers(resume_info):
     skills = set(resume_info.get("tech_skills", []))
     soft = set(resume_info.get("soft_skills", []))
     quals = " ".join(resume_info.get("qualifications", [])).lower()

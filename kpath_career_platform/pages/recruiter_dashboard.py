@@ -1,9 +1,35 @@
 import streamlit as st
 import sqlite3
 
-st.title("📂 Resume Viewer + Candidate Ranking (Recruiter Mode)")
+# --- Page Config ---
+if st.button("⬅ Back to Home"):
+    st.switch_page("app.py")
+    
+st.set_page_config(page_title="Recruiter Dashboard", page_icon="👔", layout="wide")
 
-# --- Connect to database ---
+# --- Custom CSS ---
+st.markdown("""
+    <style>
+    .candidate-card {
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        background-color: #fafafa;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
+    }
+    .candidate-card:hover {
+        background-color: #f0f8ff;
+        border-color: #007ACC;
+        box-shadow: 2px 2px 12px rgba(0,0,0,0.15);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.title("👔 Recruiter Dashboard")
+st.caption("Search, rank, and evaluate candidates with ease.")
+
+# --- Database Functions ---
 def get_resumes():
     conn = sqlite3.connect("resumes.db")
     c = conn.cursor()
@@ -26,18 +52,16 @@ def search_resumes(keyword):
     conn.close()
     return rows
 
-# --- Search box ---
-search_query = st.text_input("🔍 Search candidates by name, skill, qualification, or certification")
+# --- Sidebar Controls ---
+with st.sidebar:
+    st.header("🔍 Candidate Search & Ranking")
+    search_query = st.text_input("Search by name, skill, qualification, or certification")
+    jd_text = st.text_area("📄 Paste a Job Description (JD) here")
 
-if search_query:
-    resumes = search_resumes(search_query)
-else:
-    resumes = get_resumes()
+# --- Load resumes ---
+resumes = search_resumes(search_query) if search_query else get_resumes()
 
-# --- Candidate Ranking by JD ---
-st.subheader("📄 Candidate Ranking by Job Description")
-jd_text = st.text_area("Paste a Job Description (JD) here:")
-
+# --- Candidate Ranking ---
 ranked_candidates = []
 if jd_text and resumes:
     jd_text_lower = jd_text.lower()
@@ -46,50 +70,53 @@ if jd_text and resumes:
         candidate_id, name, qualifications, skills, soft_skills, experience, certifications = r
         score = 0
 
-        # --- Match technical skills ---
         if skills:
             for skill in skills.split(","):
                 if skill.strip().lower() in jd_text_lower:
-                    score += 2  # technical skills weighted higher
-
-        # --- Match qualifications ---
+                    score += 2
         if qualifications and any(q in jd_text_lower for q in qualifications.lower().split(",")):
             score += 1
-
-        # --- Match certifications ---
         if certifications and any(cert.lower() in jd_text_lower for cert in certifications.split(",")):
             score += 1
-
-        # --- Match soft skills ---
         if soft_skills and any(s.strip().lower() in jd_text_lower for s in soft_skills.split(",")):
             score += 0.5
 
         ranked_candidates.append((score, r))
 
-    # Sort by score (higher = better fit)
     ranked_candidates.sort(reverse=True, key=lambda x: x[0])
 
-# --- Display results ---
+# --- Display Results ---
 if resumes:
     if jd_text:
-        st.write(f"🏆 Ranked {len(ranked_candidates)} candidate(s) based on JD")
-        for score, r in ranked_candidates:
-            st.markdown("---")
-            st.subheader(f"👤 {r[1]} (ID: {r[0]}) — ⭐ Score: {score}")
-            st.markdown(f"**🎓 Qualifications:** {r[2]}")
-            st.markdown(f"**🛠 Technical Skills:** {r[3]}")
-            st.markdown(f"**🤝 Soft Skills:** {r[4]}")
-            st.markdown(f"**⌛ Experience:** {r[5]} years")
-            st.markdown(f"**🏅 Certifications:** {r[6]}")
+        st.subheader(f"🏆 Ranked Candidates ({len(ranked_candidates)})")
+
+        for i, (score, r) in enumerate(ranked_candidates, start=1):
+            medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else "⭐"
+            with st.container():
+                st.markdown(f"""
+                <div class="candidate-card">
+                    <h4>{medal} {r[1]} (ID: {r[0]}) — ⭐ Score: {score}</h4>
+                    <b>🎓 Qualifications:</b> {r[2]}<br>
+                    <b>🛠 Technical Skills:</b> {r[3]}<br>
+                    <b>🤝 Soft Skills:</b> {r[4]}<br>
+                    <b>⌛ Experience:</b> {r[5]} years<br>
+                    <b>🏅 Certifications:</b> {r[6]}<br>
+                </div>
+                """, unsafe_allow_html=True)
+
     else:
-        st.write(f"Found {len(resumes)} candidate(s).")
+        st.subheader(f"👤 Candidate Profiles ({len(resumes)})")
         for r in resumes:
-            st.markdown("---")
-            st.subheader(f"👤 {r[1]} (ID: {r[0]})")
-            st.markdown(f"**🎓 Qualifications:** {r[2]}")
-            st.markdown(f"**🛠 Technical Skills:** {r[3]}")
-            st.markdown(f"**🤝 Soft Skills:** {r[4]}")
-            st.markdown(f"**⌛ Experience:** {r[5]} years")
-            st.markdown(f"**🏅 Certifications:** {r[6]}")
+            with st.container():
+                st.markdown(f"""
+                <div class="candidate-card">
+                    <h4>👤 {r[1]} (ID: {r[0]})</h4>
+                    <b>🎓 Qualifications:</b> {r[2]}<br>
+                    <b>🛠 Technical Skills:</b> {r[3]}<br>
+                    <b>🤝 Soft Skills:</b> {r[4]}<br>
+                    <b>⌛ Experience:</b> {r[5]} years<br>
+                    <b>🏅 Certifications:</b> {r[6]}<br>
+                </div>
+                """, unsafe_allow_html=True)
 else:
-    st.warning("No resumes found in the database.")
+    st.warning("⚠️ No resumes found in the database.")

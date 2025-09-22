@@ -1,48 +1,53 @@
 import streamlit as st
-import sqlite3
 
-st.title("📂 Resume Viewer (Recruiter Mode)")
+if st.button("⬅ Back to Home"):
+    st.switch_page("app.py")
 
-# --- Connect to database ---
-def get_resumes():
-    conn = sqlite3.connect("resumes.db")
-    c = conn.cursor()
-    c.execute("SELECT id, name, qualifications, skills, soft_skills, experience, certifications FROM resumes")
-    rows = c.fetchall()
-    conn.close()
-    return rows
+st.title("📝 Resume & Interview Coach")
+st.write("Get resume tips and practice interview questions for your dream role!")
 
-def search_resumes(keyword):
-    conn = sqlite3.connect("resumes.db")
-    c = conn.cursor()
-    query = f"""
-        SELECT id, name, qualifications, skills, soft_skills, experience, certifications 
-        FROM resumes 
-        WHERE name LIKE ? OR skills LIKE ? OR soft_skills LIKE ? OR qualifications LIKE ? OR certifications LIKE ?
-    """
-    like_kw = f"%{keyword}%"
-    c.execute(query, (like_kw, like_kw, like_kw, like_kw, like_kw))
-    rows = c.fetchall()
-    conn.close()
-    return rows
+# Input
+role = st.selectbox("Select your target role:", ["Data Scientist", "Frontend Developer", "Cloud Engineer", "Project Manager"])
 
-# --- Search box ---
-search_query = st.text_input("🔍 Search candidates by name, skill, qualification, or certification")
+resume_text = st.text_area("Paste your Resume Text here:")
 
-if search_query:
-    resumes = search_resumes(search_query)
-else:
-    resumes = get_resumes()
+if st.button("Analyze Resume"):
+    st.subheader("📊 Resume Feedback:")
+    if "python" not in resume_text.lower() and role == "Data Scientist":
+        st.warning("⚠ Your resume is missing Python – a must-have for Data Scientists.")
+    if "sql" not in resume_text.lower() and role in ["Data Scientist", "Cloud Engineer"]:
+        st.warning("⚠ Add SQL skills to improve ATS score.")
+    if "leadership" not in resume_text.lower() and role == "Project Manager":
+        st.warning("⚠ Highlight leadership and management achievements.")
 
-# --- Display resumes ---
-if resumes:
-    for r in resumes:
-        st.markdown("---")
-        st.subheader(f"👤 {r[1]} (ID: {r[0]})")
-        st.markdown(f"**🎓 Qualifications:** {r[2]}")
-        st.markdown(f"**🛠 Technical Skills:** {r[3]}")
-        st.markdown(f"**🤝 Soft Skills:** {r[4]}")
-        st.markdown(f"**⌛ Experience:** {r[5]} years")
-        st.markdown(f"**🏅 Certifications:** {r[6]}")
-else:
-    st.warning("No resumes found in the database.")
+    st.success("✅ Resume analysis complete!")
+
+# Mock interview questions
+st.subheader("🎤 Practice Interview Questions")
+questions = {
+    "Data Scientist": [
+        "Explain supervised vs. unsupervised learning.",
+        "How would you handle imbalanced datasets?",
+        "What are precision and recall?"
+    ],
+    "Frontend Developer": [
+        "What are the differences between React and Angular?",
+        "Explain the virtual DOM.",
+        "How do you optimize a website for performance?"
+    ],
+    "Cloud Engineer": [
+        "What is the difference between AWS EC2 and S3?",
+        "Explain Docker vs. Kubernetes.",
+        "What is CI/CD?"
+    ],
+    "Project Manager": [
+        "Explain Agile vs. Waterfall methodologies.",
+        "How do you handle conflicts in your team?",
+        "What’s your experience with project management tools?"
+    ]
+}
+
+if role:
+    st.write("Here are some common interview questions:")
+    for q in questions[role]:
+        st.write(f"👉 {q}")

@@ -3,6 +3,10 @@ import PyPDF2
 from models import resume_parser
 from utils import db
 
+if st.button("⬅ Back to Home"):
+    st.switch_page("app.py")
+
+
 # Optional: enable OpenAI embeddings for better skill matching
 USE_AI_MATCHING = False
 
