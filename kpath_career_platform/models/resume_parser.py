@@ -1,5 +1,12 @@
 import re
 import spacy
+import spacy
+import subprocess
+
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
 
 
 # Load spaCy English model

@@ -3,6 +3,14 @@ import PyPDF2
 from models import resume_parser
 from utils import db
 from components import render_header, render_footer  # ✅ Reuse header & footer
+import spacy
+import subprocess
+
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+    nlp = spacy.load("en_core_web_sm")
 
 # --- Page Config ---
 st.set_page_config(page_title="Career Matchmaking", layout="wide")

@@ -1,5 +1,8 @@
 import streamlit as st
+from utils import db
 
+# Initialize DB on app startup
+db.init_db()
 # --- Page Config ---
 st.set_page_config(
     page_title="K-Path Career Platform",
