@@ -1,9 +1,12 @@
 import sqlite3
 
+DB_NAME = "resumes.db"
+
 def init_db():
-    conn = sqlite3.connect("resumes.db")
+    """Initialize the resumes database"""
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    c.execute("""
+    c.execute('''
         CREATE TABLE IF NOT EXISTS resumes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
@@ -13,21 +16,12 @@ def init_db():
             experience INTEGER,
             certifications TEXT
         )
-    """)
+    ''')
     conn.commit()
     return conn
 
-def save_resume(conn, name, resume_info):
+def delete_candidate(conn, candidate_id):
+    """Delete candidate from database by ID"""
     c = conn.cursor()
-    c.execute("""
-        INSERT INTO resumes (name, qualifications, skills, soft_skills, experience, certifications)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (
-        name,
-        ", ".join(resume_info["qualifications"]),
-        ", ".join(resume_info["tech_skills"]),
-        ", ".join(resume_info["soft_skills"]),
-        resume_info["experience"],
-        ", ".join(resume_info["certifications"])
-    ))
+    c.execute("DELETE FROM resumes WHERE id=?", (candidate_id,))
     conn.commit()

@@ -1,11 +1,15 @@
 import streamlit as st
 import sqlite3
+from components import render_header, render_footer
+from utils import db  # ✅ import db functions
+
+render_header()
 
 # --- Page Config ---
+st.set_page_config(page_title="Recruiter Dashboard", page_icon="👔", layout="wide")
+
 if st.button("⬅ Back to Home"):
     st.switch_page("app.py")
-    
-st.set_page_config(page_title="Recruiter Dashboard", page_icon="👔", layout="wide")
 
 # --- Custom CSS ---
 st.markdown("""
@@ -91,32 +95,50 @@ if resumes:
         st.subheader(f"🏆 Ranked Candidates ({len(ranked_candidates)})")
 
         for i, (score, r) in enumerate(ranked_candidates, start=1):
+            candidate_id, name, qualifications, skills, soft_skills, experience, certifications = r
             medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else "⭐"
             with st.container():
                 st.markdown(f"""
                 <div class="candidate-card">
-                    <h4>{medal} {r[1]} (ID: {r[0]}) — ⭐ Score: {score}</h4>
-                    <b>🎓 Qualifications:</b> {r[2]}<br>
-                    <b>🛠 Technical Skills:</b> {r[3]}<br>
-                    <b>🤝 Soft Skills:</b> {r[4]}<br>
-                    <b>⌛ Experience:</b> {r[5]} years<br>
-                    <b>🏅 Certifications:</b> {r[6]}<br>
+                    <h4>{medal} {name} (ID: {candidate_id}) — ⭐ Score: {score}</h4>
+                    <b>🎓 Qualifications:</b> {qualifications}<br>
+                    <b>🛠 Technical Skills:</b> {skills}<br>
+                    <b>🤝 Soft Skills:</b> {soft_skills}<br>
+                    <b>⌛ Experience:</b> {experience} years<br>
+                    <b>🏅 Certifications:</b> {certifications}<br>
                 </div>
                 """, unsafe_allow_html=True)
+
+                # 🚨 Delete button
+                if st.button(f"🗑 Delete {name}", key=f"delete_{candidate_id}"):
+                    conn = db.init_db()
+                    db.delete_candidate(conn, candidate_id)
+                    st.success(f"Candidate {name} deleted successfully ✅")
+                    st.rerun()
 
     else:
         st.subheader(f"👤 Candidate Profiles ({len(resumes)})")
         for r in resumes:
+            candidate_id, name, qualifications, skills, soft_skills, experience, certifications = r
             with st.container():
                 st.markdown(f"""
                 <div class="candidate-card">
-                    <h4>👤 {r[1]} (ID: {r[0]})</h4>
-                    <b>🎓 Qualifications:</b> {r[2]}<br>
-                    <b>🛠 Technical Skills:</b> {r[3]}<br>
-                    <b>🤝 Soft Skills:</b> {r[4]}<br>
-                    <b>⌛ Experience:</b> {r[5]} years<br>
-                    <b>🏅 Certifications:</b> {r[6]}<br>
+                    <h4>👤 {name} (ID: {candidate_id})</h4>
+                    <b>🎓 Qualifications:</b> {qualifications}<br>
+                    <b>🛠 Technical Skills:</b> {skills}<br>
+                    <b>🤝 Soft Skills:</b> {soft_skills}<br>
+                    <b>⌛ Experience:</b> {experience} years<br>
+                    <b>🏅 Certifications:</b> {certifications}<br>
                 </div>
                 """, unsafe_allow_html=True)
+
+                # 🚨 Delete button
+                if st.button(f"🗑 Delete {name}", key=f"delete_{candidate_id}"):
+                    conn = db.init_db()
+                    db.delete_candidate(conn, candidate_id)
+                    st.success(f"Candidate {name} deleted successfully ✅")
+                    st.rerun()
 else:
     st.warning("⚠️ No resumes found in the database.")
+
+render_footer()
