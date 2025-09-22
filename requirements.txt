@@ -1,0 +1,19 @@
+# --- Core Framework ---
+streamlit
+PyPDF2
+
+# --- NLP & Resume Parsing ---
+spacy
+# Install English model directly from release
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
+
+# --- Database ---
+sqlite3-binary
+
+# --- Utilities ---
+pandas
+numpy
+
+# --- Optional (for deployment stability) ---
+tqdm
+scikit-learn
