@@ -1,60 +1,53 @@
-import streamlit as st
+import random
 
-# --- Page Config ---
-st.set_page_config(page_title="Interview AI", page_icon="🤖", layout="wide")
+# Role-based interview questions
+role_questions = {
+    "Data Scientist": [
+        "Explain supervised vs unsupervised learning.",
+        "How do you handle missing data?",
+    ],
+    "Software Engineer": [
+        "What are OOP principles?",
+        "How do you debug a slow SQL query?",
+    ],
+    "Frontend Developer": [
+        "What’s the difference between state and props in React?",
+        "How do you improve website performance?",
+    ],
+    "Backend Developer": [
+        "Explain REST vs GraphQL.",
+        "How do you secure APIs?",
+    ],
+    "AI/ML Engineer": [
+        "How do you prevent overfitting?",
+        "Explain CNNs vs RNNs.",
+    ],
+    "Business Analyst": [
+        "How do you gather requirements?",
+        "What tools do you use for visualization?",
+    ],
+}
 
-# --- Back Button ---
-if st.button("⬅ Back to Home"):
-    st.switch_page("app.py")
+def get_questions(role):
+    return role_questions.get(role, [])
 
-st.title("🤖 AI Interview Coach")
+def evaluate_answer(question, answer):
+    """
+    Simple scoring logic:
+    - Short answers (<15 words) → low score
+    - Medium answers (15–40 words) → medium score
+    - Long detailed answers (>40 words) → high score
+    """
+    words = len(answer.split())
 
-st.write("Practice your interview skills with AI-generated questions and instant feedback.")
+    if words < 15:
+        score = random.randint(2, 4)
+        feedback = "Your answer is too short. Try explaining with more details and examples."
+    elif words < 40:
+        score = random.randint(5, 7)
+        feedback = "Decent answer. You can add more structure (Situation, Task, Action, Result)."
+    else:
+        score = random.randint(8, 10)
+        feedback = "Great answer! Well explained with enough details."
 
-# --- Select role ---
-role = st.selectbox("Choose the role you're applying for:", 
-                    ["Data Scientist", "Software Engineer", "Frontend Developer", "Backend Developer", "AI/ML Engineer", "Business Analyst"])
-
-if role:
-    st.subheader(f"💼 Mock Interview for {role}")
-
-    # Example questions
-    questions = {
-        "Data Scientist": [
-            "Can you explain the difference between supervised and unsupervised learning?",
-            "How would you handle missing values in a dataset?",
-        ],
-        "Software Engineer": [
-            "What are the main principles of Object-Oriented Programming?",
-            "How would you optimize a slow SQL query?",
-        ],
-        "Frontend Developer": [
-            "What’s the difference between React state and props?",
-            "How do you improve website performance?",
-        ],
-        "Backend Developer": [
-            "What’s the difference between REST and GraphQL?",
-            "How do you secure APIs from unauthorized access?",
-        ],
-        "AI/ML Engineer": [
-            "How do you prevent overfitting in machine learning?",
-            "Explain the difference between CNNs and RNNs.",
-        ],
-        "Business Analyst": [
-            "How do you gather requirements from stakeholders?",
-            "What tools do you use for data visualization?",
-        ],
-    }
-
-    for q in questions[role]:
-        st.markdown(f"**❓ {q}**")
-        answer = st.text_area("Your Answer:", key=q)
-
-        if answer:
-            # Simple keyword-based feedback
-            if len(answer.split()) < 15:
-                st.warning("⚠️ Try to expand your answer with more details.")
-            else:
-                st.success("✅ Good! You provided a detailed answer.")
-
-st.info("💡 Tip: Use STAR (Situation, Task, Action, Result) method for answering behavioral questions.")
+    return score, feedback

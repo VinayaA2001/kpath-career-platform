@@ -1,5 +1,7 @@
 import streamlit as st
+from components import render_header, render_footer
 
+render_header()
 if st.button("⬅ Back to Home"):
     st.switch_page("app.py")
 
@@ -51,3 +53,4 @@ if role:
     st.write("Here are some common interview questions:")
     for q in questions[role]:
         st.write(f"👉 {q}")
+render_footer()

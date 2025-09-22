@@ -1,5 +1,6 @@
 import streamlit as st
-
+from components import render_header, render_footer
+render_header()
 # Back button
 if st.button("⬅ Back to Home"):
     st.switch_page("app.py")
@@ -31,3 +32,4 @@ for mentor in mentors:
             st.write(f"📧 Contact: {mentor['contact']}")
             if st.button(f"Request Mentorship from {mentor['name']}", key=mentor['name']):
                 st.success(f"✅ Request sent to {mentor['name']}! They will contact you soon.")
+            render_footer() 

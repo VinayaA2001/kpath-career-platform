@@ -1,10 +1,13 @@
 import streamlit as st
 import sqlite3
+from components import render_header, render_footer
+
+render_header()
 
 # --- Database Setup ---
 if st.button("⬅ Back to Home"):
     st.switch_page("app.py")
-    
+
 def init_db():
     conn = sqlite3.connect("jobs.db")
     c = conn.cursor()
@@ -102,3 +105,4 @@ if jobs:
                     st.rerun()
 else:
     st.info("No jobs available. Please add a new one from the sidebar.")
+render_footer()
