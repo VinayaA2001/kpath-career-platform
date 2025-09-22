@@ -2,6 +2,7 @@ import streamlit as st
 import PyPDF2
 from models import resume_parser
 from utils import db
+import spacy
 
 # --- Page Title ---
 st.title("📂 Resume Analyzer")
